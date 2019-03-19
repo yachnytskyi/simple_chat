@@ -17,6 +17,7 @@ namespace simple_chat
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSignalR();
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -27,14 +28,9 @@ namespace simple_chat
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<ChatHub>("/chat",
-                    options => {
-                        options.ApplicationMaxBufferSize = 64;
-                        options.TransportMaxBufferSize = 64;
-                        options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);
-                        options.Transports = HttpTransportType.LongPolling | HttpTransportType.WebSockets;
-                });
+                routes.MapHub<ChatHub>("/chat");
             });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
