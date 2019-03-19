@@ -3,6 +3,6 @@
   "name": "simple_chat",
   "private": true,
   "dependencies": {
-    "@aspnet/signalr": "^1.0.0"
+    "@aspnet/signalr": "^1.0.4"
   }
 }
