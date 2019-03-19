@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace simple_chat
@@ -26,7 +27,13 @@ namespace simple_chat
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<ChatHub>("/chat");
+                routes.MapHub<ChatHub>("/chat",
+                    options => {
+                        options.ApplicationMaxBufferSize = 64;
+                        options.TransportMaxBufferSize = 64;
+                        options.LongPolling.PollTimeout = System.TimeSpan.FromMinutes(1);
+                        options.Transports = HttpTransportType.LongPolling | HttpTransportType.WebSockets;
+                });
             });
         }
     }
