@@ -5,43 +5,77 @@
     <title>SignalR Chat</title>
 </head>
 <body>
+    <div id="loginBlock">
+        Введите логин:<br />
+        <input id="userName" type="text" />
+        <input id="userPassword" type="text" />
+        <input id="loginBtn" type="button" value="Войти" />
+    </div><br />
+
+    <div id="header"></div><br />
+
     <div id="inputForm">
-        <input type="text" name="items" /><br /><br />
-        <input type="text" name="items" /><br /><br />
-        <input type="text" name="items" /><br /><br />
-        <input type="button" id="sendBtn" value="Отправить" />
+        <input type="text" id="message" />
+        <input type="button" id="sendBtn" disabled value="Отправить" />
     </div>
-    <div><p id="response"></p></div>
+    <div id="chatroom"></div>
+
     <script src="js/signalr.min.js"></script>
     <script>
-        let hubUrl = "/chat";
+        let token;      // token
+        let username;   // username
         const hubConnection = new signalR.HubConnectionBuilder()
-            .withUrl(hubUrl)
+            .withUrl("/chat", { accessTokenFactory: () => token })
             .build();
 
-        // receiving a message from the server
-        hubConnection.on("Receive", function (data) {
+        hubConnection.on("Receive", function (message, userName) {
 
-            document.getElementById("response").innerHTML = "";
-            for (let i = 0; i < data.length; i++) {
+            // create a <b> element for the username
+            let userNameElem = document.createElement("b");
+            userNameElem.appendChild(document.createTextNode(userName + ": "));
 
-                document.getElementById("response").innerHTML += "<p>" + data[i] + "</p>";
-            }
+            // creates a <p> element for a user message
+            let elem = document.createElement("p");
+            elem.appendChild(userNameElem);
+            elem.appendChild(document.createTextNode(message));
+
+            var firstElem = document.getElementById("chatroom").firstChild;
+            document.getElementById("chatroom").insertBefore(elem, firstElem);
         });
 
+        // authentication
+        document.getElementById("loginBtn").addEventListener("click", function (e) {
+
+            var request = new XMLHttpRequest();
+            // send a request to the address "/ token", in response we will receive a token and username
+            request.open("POST", "/token", true);
+            request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.addEventListener("load", function () {
+                if (request.status < 400) { // if the request is successful
+
+                    let data = JSON.parse(request.response);   // response parser
+                    token = data.access_token;
+                    username = data.username;
+
+                    document.getElementById("sendBtn").disabled = false;
+
+                    hubConnection.start()       // start connecting to the hub
+                        .catch(err => {
+                            console.error(err.toString());
+                            document.getElementById("loginBtn").disabled = true;
+                            document.getElementById("sendBtn").disabled = true;
+                        });
+                }
+            });
+            // send authentication request
+            request.send("username=" + document.getElementById("userName").value +
+                "&password=" + document.getElementById("userPassword").value);
+        });
         // sending a message to the server
         document.getElementById("sendBtn").addEventListener("click", function (e) {
-
-            const itemElems = document.getElementsByName("items");
-            let items = [];
-            for (let i = 0; i < itemElems.length; i++) {
-                items.push(itemElems[i].value);
-                itemElems[i].value = "";
-            }
-            hubConnection.invoke("Send", items);
+            let message = document.getElementById("message").value;
+            hubConnection.invoke("Send", message, username);
         });
-
-        hubConnection.start();
     </script>
 </body>
 </html>
