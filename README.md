@@ -2,7 +2,7 @@
 
 Simple Chat created on ASP.NET Core MVC with SignalR ( real time app)
 
-Thanks for viewing the Simple Chat, it was created for learning and practice. Simple Chat - a simple pet project ( realtime Web App 
+Thanks for viewing the Simple Chat, it was created for learning and practice. Simple Chat - a simple pet project ( realtime Web App )
 
 Build Status
 
