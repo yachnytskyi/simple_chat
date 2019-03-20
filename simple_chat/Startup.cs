@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ namespace simple_chat
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
             string connection = "Server=(localdb)\\mssqllocaldb;Database=simplechatdb;Trusted_Connection=True;";
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection));
 

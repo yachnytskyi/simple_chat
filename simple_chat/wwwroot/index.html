@@ -6,37 +6,43 @@
 </head>
 <body>
     <div id="loginBlock">
-        Введите логин:<br />
+        Enter login:<br />
         <input id="userName" type="text" />
         <input id="userPassword" type="text" />
-        <input id="loginBtn" type="button" value="Войти" />
+        <input id="loginBtn" type="button" value="Enter" />
     </div><br />
 
-    <div id="header"></div><br />
-
     <div id="inputForm">
-        <input type="text" id="message" />
-        <input type="button" id="sendBtn" disabled value="Отправить" />
+        <input type="text" id="message" placeholder="Enter message" />
+        <input type="text" id="receiver" placeholder="Enter recepient" />
+        <input type="button" id="sendBtn" disabled value="To send" />
     </div>
     <div id="chatroom"></div>
 
     <script src="js/signalr.min.js"></script>
     <script>
-        let token;      // token
-        let username;   // username
+        let token;
         const hubConnection = new signalR.HubConnectionBuilder()
             .withUrl("/chat", { accessTokenFactory: () => token })
             .build();
-
         hubConnection.on("Receive", function (message, userName) {
 
             // create a <b> element for the username
             let userNameElem = document.createElement("b");
             userNameElem.appendChild(document.createTextNode(userName + ": "));
 
-            // creates a <p> element for a user message
+            // creates a <p> element for the user message
             let elem = document.createElement("p");
             elem.appendChild(userNameElem);
+            elem.appendChild(document.createTextNode(message));
+
+            var firstElem = document.getElementById("chatroom").firstChild;
+            document.getElementById("chatroom").insertBefore(elem, firstElem);
+        });
+        hubConnection.on("Notify", function (message) {
+
+            // creates a <p> element for the user message
+            let elem = document.createElement("p");
             elem.appendChild(document.createTextNode(message));
 
             var firstElem = document.getElementById("chatroom").firstChild;
@@ -47,24 +53,26 @@
         document.getElementById("loginBtn").addEventListener("click", function (e) {
 
             var request = new XMLHttpRequest();
-            // send a request to the address "/ token", in response we will receive a token and username
             request.open("POST", "/token", true);
             request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             request.addEventListener("load", function () {
                 if (request.status < 400) { // if the request is successful
 
-                    let data = JSON.parse(request.response);   // response parser
+                    let data = JSON.parse(request.response);
                     token = data.access_token;
-                    username = data.username;
 
                     document.getElementById("sendBtn").disabled = false;
 
-                    hubConnection.start()       // start connecting to the hub
+                    hubConnection.start()  // start connecting to the hub
                         .catch(err => {
                             console.error(err.toString());
                             document.getElementById("loginBtn").disabled = true;
                             document.getElementById("sendBtn").disabled = true;
                         });
+                }
+                else {
+                    console.log("Status", request.status);
+                    console.log(request.responseText);
                 }
             });
             // send authentication request
@@ -74,7 +82,8 @@
         // sending a message to the server
         document.getElementById("sendBtn").addEventListener("click", function (e) {
             let message = document.getElementById("message").value;
-            hubConnection.invoke("Send", message, username);
+            let to = document.getElementById("receiver").value;
+            hubConnection.invoke("Send", message, to);
         });
     </script>
 </body>
