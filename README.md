@@ -29,7 +29,7 @@ REQUIREMENTS
 
 The minimum requirement by Simple Chat is that your Web server supports ASP.NET Core 2.1 or above. The Simple Chat has been tested with the embedded IIS HTTP server in Windows 10. Please access the following URL to check if your Web server reaches the requirements by Simple Chat:
 
-http://localhost:44394/ ( If you have a different port for localhost, please change the value of the string public const string AUDIENCE = "https: // localhost: 44394"; // token customer, instead of 44394 write your port number  )
+http://localhost:44394/ ( If you have a different port for localhost, please open the file AuthOptions.cs and change the value of the string public const string AUDIENCE = "https: // localhost: 44394"; instead of 44394 write your port number.  )
 
 QUICK START
 
