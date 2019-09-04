@@ -1,6 +1,6 @@
 Accounts for Authorization:
 
-admin user Email = "admin@mail.ru", Password = "123456"
+admin user Email = "admin@mail.ru", Password = "123456"   
 admin user Email = tom@mail.ru", Password = "123456"
 user       Email = "bob@mail.ru", Password = "123456"user  Email = "sam@mail.ru", Password = "123456"
 
